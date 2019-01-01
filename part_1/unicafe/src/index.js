@@ -33,7 +33,7 @@ const Statistics = ({good, neutral, bad, total}) => {
     );
   }
   
-  const getPercentage = value => ((value / total) * 100).toFixed(4);
+  const getPercentage = value => `${((value / total) * 100).toFixed(4)}%`;
 
   return (
     <>
@@ -44,9 +44,9 @@ const Statistics = ({good, neutral, bad, total}) => {
           <Statistic name="Neutral:" value={neutral}/>
           <Statistic name="Bad:" value={bad}/>
           <Statistic name="Total Received:" value={total} />
-          <Statistic name="Average Positive:" value={getPercentage(good) + '%'} />
-          <Statistic name="Average Neutral:" value={getPercentage(neutral) + '%'} />
-          <Statistic name="Average Bad:" value={getPercentage(bad) + '%'} />
+          <Statistic name="Average Positive:" value={getPercentage(good)} />
+          <Statistic name="Average Neutral:" value={getPercentage(neutral)} />
+          <Statistic name="Average Bad:" value={getPercentage(bad)} />
         </tbody>
       </table>
     </>
