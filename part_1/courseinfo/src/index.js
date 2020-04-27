@@ -3,15 +3,19 @@ import ReactDOM from 'react-dom';
 
 const Header = (props) => (
   <h1>{props.course}</h1>
-  );
+);
+
+const Part = (props) => (
+  <p>{props.part} {props.exercise}</p>
+);
 
 const Content = (props) => (
-    <div>
-      <p>{props.part1} {props.exercise1}</p>
-      <p>{props.part2} {props.exercise2}</p>
-      <p>{props.part3} {props.exercise3}</p>
-    </div>
-  );
+  <>
+    <Part part={props.parts.part1} exercise={props.exercises.exercise1} />
+    <Part part={props.parts.part2} exercise={props.exercises.exercise2} />
+    <Part part={props.parts.part3} exercise={props.exercises.exercise3} />
+  </>
+);
 
 const Total = (props) => (
   <p>
@@ -30,9 +34,9 @@ const App = () => {
 
   return (
     <div>
-      <Header course={course} />
-      <Content part1={part1} exercise1={exercise1} part2={part2} exercise2={exercise2} part3={part3} exercise3={exercise3}/>
-      <Total total={exercise1 + exercise2 + exercise3} />
+      <Header course={ course } />
+      <Content parts={ { part1, part2, part3 } } exercises= { {exercise1, exercise2, exercise3 } } />
+      <Total total={ exercise1 + exercise2 + exercise3 } />
     </div>
   );
 };
