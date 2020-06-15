@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Input from "./components/Input";
 import Form from "./components/Form";
 import Persons from "./components/Persons";
+import dbService from "./services/db";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -19,6 +19,13 @@ const App = () => {
   const filterChangeHandler = (event) => {
     setNewFilter(event.target.value);
   };
+
+  const addRecordHandler = async (record) => {
+    dbService.addOne(record)
+      .then((response) =>
+      setPersons(persons.concat(response))
+    );
+  };
   const submitHandler = (event) => {
     event.preventDefault();
 
@@ -32,21 +39,15 @@ const App = () => {
       ? alert(`${newName} is already in the book!`)
       : persons.find((person) => person.number === newNumber)
       ? alert(`${newNumber} is already in the book!`)
-      : setPersons(
-          persons.concat({
-            name: newName,
-            number: newNumber,
-          })
-        );
+      : addRecordHandler({
+          name: newName,
+          number: newNumber,
+        });
   };
 
-  useEffect(
-    () =>
-      axios
-        .get("http://localhost:3001/persons")
-        .then((response) => setPersons(response.data)),
-    []
-  );
+  useEffect(() => {
+    dbService.getAll().then((people) => setPersons(people));
+  }, []);
 
   return (
     <div>
