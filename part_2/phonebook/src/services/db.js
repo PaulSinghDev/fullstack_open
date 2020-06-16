@@ -11,10 +11,13 @@ const addOne = async (newObject) => {
   return request.then(response => response.data);
 };
 
-const deleteOne = (id) => {};
+const deleteOne = async (id) => {
+  const request = axios.delete(`${baseUrl}/${id}`);
+  return request.then(response => response.data);
+};
 
-const updateOne = (id, updatedObject) => {
-  const request = axios.put(`${baseUrl}/${id}`, updatedObject);
+const updateOne = async (updatedObject) => {
+  const request = axios.put(`${baseUrl}/${updatedObject.id}`, updatedObject);
   return request.then(response => response.data);
 };
 
