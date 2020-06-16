@@ -26,6 +26,19 @@ const App = () => {
       setPersons(persons.concat(response))
     );
   };
+
+  const updateRecordHandler = () => {
+    const message = `${newName} is already in the phone book. Would you like to update the phone number to ${newNumber}?`;    
+    if(window.confirm(message)) {
+      const record = persons.find(person => person.name === newName);
+      record.number = newNumber;
+
+      dbService.updateOne(record);
+
+      setPersons(persons.map(person => person.id !== record.id ? person : record));
+    }
+  };
+
   const submitHandler = (event) => {
     event.preventDefault();
 
@@ -36,7 +49,7 @@ const App = () => {
       : persons.find(
           (person) => person.name.toLowerCase() === newName.toLowerCase()
         )
-      ? alert(`${newName} is already in the book!`)
+      ? updateRecordHandler()
       : persons.find((person) => person.number === newNumber)
       ? alert(`${newNumber} is already in the book!`)
       : addRecordHandler({
@@ -62,7 +75,7 @@ const App = () => {
         submitHandler={submitHandler}
       />
       <h2>Phone Numbers</h2>
-      <Persons persons={persons} filter={newFilter} />
+      <Persons updatePeople={(people) => setPersons(people)} persons={persons} filter={newFilter} />
     </div>
   );
 };
