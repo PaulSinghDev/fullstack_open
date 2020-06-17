@@ -50,7 +50,7 @@ const App = () => {
   };
 
 
-  const addRecordHandler = async (record) => {
+  const addRecordHandler = (record) => {
     dbService
       .addOne(record)
       .then((response) => {
