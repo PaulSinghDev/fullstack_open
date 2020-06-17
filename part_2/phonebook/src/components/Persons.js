@@ -1,18 +1,7 @@
 import React from "react";
-import dbService from "../services/db";
 import Button from "./Button";
 
-const Persons = ({ persons, filter, updatePeople }) => {
-  
-  const onClickHandler = async (id) => {
-    const person = persons.find(person => person.id === id);
-    if (window.confirm(`Are you sure you wish to delete the entry for ${person.name}`)){
-      dbService.deleteOne(id)
-        .then(() => updatePeople(persons.filter(person => person.id !== id)));
-    }
-  };
-
-  return (
+const Persons = ({ persons, filter, clickHandler }) => (
     <ul>
       {persons
         .filter((person) =>
@@ -22,7 +11,7 @@ const Persons = ({ persons, filter, updatePeople }) => {
           <li key={filteredPerson.name}>
             {filteredPerson.name} - {filteredPerson.number}
             <Button
-              onClick={() => onClickHandler(filteredPerson.id)}
+              onClick={() => clickHandler(filteredPerson.id)}
               type="submit"
               text="Delete"
             />
@@ -30,6 +19,5 @@ const Persons = ({ persons, filter, updatePeople }) => {
         ))}
     </ul>
   );
-};
 
 export default Persons;
