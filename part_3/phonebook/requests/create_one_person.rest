@@ -1,0 +1,6 @@
+POST https://cryptic-savannah-18025.herokuapp.com/api/persons
+
+{
+    "name": "John",
+    "number": "07988987654"
+}
