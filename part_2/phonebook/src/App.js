@@ -24,23 +24,28 @@ const App = () => {
   };
 
   const removeRecordHandler = (id) => {
-    const person = persons.find(person => person.id === id);
-    if (window.confirm(`Are you sure you wish to delete the entry for ${person.name}`)){
-      dbService.deleteOne(id)
+    const person = persons.find((person) => person.id === id);
+    if (
+      window.confirm(
+        `Are you sure you wish to delete the entry for ${person.name}`
+      )
+    ) {
+      dbService
+        .deleteOne(id)
         .then(() => {
-          setPersons(persons.filter(person => person.id !== id));
+          setPersons(persons.filter((person) => person.id !== id));
           setNotificationMessage({
             content: `All information related to ${person.name} has been removed from the database.`,
-            fail: false
+            fail: false,
           });
           setTimeout(() => {
             setNotificationMessage(null);
           }, 5000);
         })
-        .catch(error => {
+        .catch((error) => {
           setNotificationMessage({
             content: `It looks as though there has been an error removing ${person.name} from the database`,
-            fail: true
+            fail: true,
           });
           setTimeout(() => {
             setNotificationMessage(null);
@@ -48,7 +53,6 @@ const App = () => {
         });
     }
   };
-
 
   const addRecordHandler = (record) => {
     dbService
@@ -75,59 +79,67 @@ const App = () => {
   };
 
   const updateRecordHandler = (toUpdate) => {
-    if(toUpdate === 'name') {
-      let record = {...persons.find((person) => person.name === newName)};
+    if (toUpdate === "name") {
+      let record = { ...persons.find((person) => person.name === newName) };
       const message = `${record.name} is already in the phone book. Would you like to update the phone number to ${newNumber}?`;
-      if(window.confirm(message)) {
+      if (window.confirm(message)) {
         record.number = newNumber;
         db.updateOne(record)
-        .then(response => {
-          setPersons(persons.map(person => person.id !== record.id ? person : record));
-          setNotificationMessage({
-            content: `The number associated with ${response.name} has been changed to ${response.number}`,
-            fail: false
+          .then((response) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== record.id ? person : record
+              )
+            );
+            setNotificationMessage({
+              content: `The number associated with ${response.name} has been changed to ${response.number}`,
+              fail: false,
+            });
+            setTimeout(() => {
+              setNotificationMessage(null);
+            }, 5000);
+          })
+          .catch((error) => {
+            setNotificationMessage({
+              content: `It looks as though there has been an error. The number for ${record.name} has not been updated.`,
+              fail: true,
+            });
+            setTimeout(() => {
+              setNotificationMessage(null);
+            }, 5000);
           });
-          setTimeout(() => {
-            setNotificationMessage(null);
-          }, 5000);
-        })
-        .catch(error => {
-          setNotificationMessage({
-            content: `It looks as though there has been an error. The number for ${record.name} has not been updated.`,
-            fail: true
-          });
-          setTimeout(() => {
-            setNotificationMessage(null);
-          }, 5000);
-        });
-      };
+      }
     } else {
-      let record = {...persons.find((person) => person.number === newNumber)};
+      let record = { ...persons.find((person) => person.number === newNumber) };
       const message = `${record.number} is already in the phone book under the name ${record.name}. Would you like to change the name to ${newName}?`;
-      if(window.confirm(message)) {
+      if (window.confirm(message)) {
         record.name = newName;
 
         db.updateOne(record)
-        .then(response => {
-          setPersons(persons.map(person => person.id !== record.id ? person : record));
-          setNotificationMessage({
-            content: `The name associated with the number ${response.number} has been changed to ${response.name}`,
-            fail: false
+          .then((response) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== record.id ? person : record
+              )
+            );
+            setNotificationMessage({
+              content: `The name associated with the number ${response.number} has been changed to ${response.name}`,
+              fail: false,
+            });
+            setTimeout(() => {
+              setNotificationMessage(null);
+            }, 5000);
+          })
+          .catch((error) => {
+            setNotificationMessage({
+              content: `It looks as though there has been an error. The name associated with ${record.number} has not been updated.`,
+              fail: true,
+            });
+            setTimeout(() => {
+              setNotificationMessage(null);
+            }, 5000);
           });
-          setTimeout(() => {
-            setNotificationMessage(null);
-          }, 5000);
-        })
-        .catch(error => {
-          setNotificationMessage({
-            content: `It looks as though there has been an error. The name associated with ${record.number} has not been updated.`,
-            fail: true
-          });
-          setTimeout(() => {
-            setNotificationMessage(null);
-          }, 5000);
-        });
-      };
+      }
     }
   };
 
@@ -135,28 +147,33 @@ const App = () => {
     event.preventDefault();
 
     return !newName
-      ? (
-        setNotificationMessage({content: 'It looks like you haven\'t entered a name', fail: true}),
-        setTimeout(() => setNotificationMessage(null), 5000)
-      ) : !newNumber
-      ? (
-        setNotificationMessage({content: 'It looks like you haven\'t entered a number', fail: true}),
-        setTimeout(() => setNotificationMessage(null), 5000)
-      ) : persons.find(
+      ? (setNotificationMessage({
+          content: "It looks like you haven't entered a name",
+          fail: true,
+        }),
+        setTimeout(() => setNotificationMessage(null), 5000))
+      : !newNumber
+      ? (setNotificationMessage({
+          content: "It looks like you haven't entered a number",
+          fail: true,
+        }),
+        setTimeout(() => setNotificationMessage(null), 5000))
+      : persons.find(
           (person) => person.name.toLowerCase() === newName.toLowerCase()
         )
-      ? updateRecordHandler('name')
+      ? updateRecordHandler("name")
       : persons.find((person) => person.number === newNumber)
-      ? updateRecordHandler('number')
+      ? updateRecordHandler("number")
       : addRecordHandler({
           name: newName,
           number: newNumber,
         });
   };
 
-
   useEffect(() => {
-    dbService.getAll().then((people) => setPersons(people));
+    dbService.getAll().then((people) => {
+      setPersons(people);
+    });
   }, []);
 
   return (
