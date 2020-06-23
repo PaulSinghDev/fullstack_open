@@ -34,7 +34,6 @@ const App = () => {
       dbService
         .deleteOne(id)
         .then((response) => {
-          console.log(response);
           setPersons(persons.filter((person) => person.id !== id));
           setNotificationMessage({
             content: `All information related to ${person.name} has been removed from the database.`,
@@ -152,7 +151,6 @@ const App = () => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    console.log(newName, newNumber);
     return !newName || newName === undefined
       ? (setNotificationMessage({
           content: "It looks like you haven't entered a name",

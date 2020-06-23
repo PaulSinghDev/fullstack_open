@@ -9,7 +9,7 @@
     "dev": "nodemon server/index.js",
     "start:react": "react-scripts start",
     "start:full": "npm run dev && npm run start:react",
-    "build": "rm -rf build && react-scripts build --production",
+    "build": "react-scripts build --production",
     "test:react": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "git push heroku master",
