@@ -1,14 +1,15 @@
 import React from "react";
 import Button from "./Button";
 
-const Persons = ({ persons, filter, clickHandler }) => (
+const Persons = ({ persons, filter, clickHandler }) => {
+  return (
     <ul>
       {persons
         .filter((person) =>
           person.name.toLowerCase().includes(filter.toLowerCase())
         )
         .map((filteredPerson) => (
-          <li key={filteredPerson.name}>
+          <li key={filteredPerson.id}>
             {filteredPerson.name} - {filteredPerson.number}
             <Button
               onClick={() => clickHandler(filteredPerson.id)}
@@ -19,5 +20,6 @@ const Persons = ({ persons, filter, clickHandler }) => (
         ))}
     </ul>
   );
+};
 
 export default Persons;

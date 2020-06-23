@@ -1,10 +1,9 @@
 import axios from "axios";
 const baseUrl = "/api/persons";
-console.log(baseUrl);
+
 const getAll = async () => {
   const request = axios.get(baseUrl);
-  const fakeRecord = { id: 999, name: "Not-on Server", number: '07878797865' };
-  return request.then((response) => response.data.concat(fakeRecord));
+  return request.then((response) => response.data);
 };
 
 const addOne = async (newObject) => {

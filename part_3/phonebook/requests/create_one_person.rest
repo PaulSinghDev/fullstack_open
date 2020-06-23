@@ -1,6 +1,7 @@
 POST https://cryptic-savannah-18025.herokuapp.com/api/persons
+Content-Type: application/json
 
 {
-    "name": "John",
-    "number": "07988987654"
+    "name": "Jiz Rag",
+    "number": "878787878"
 }
