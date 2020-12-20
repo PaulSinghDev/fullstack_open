@@ -21,8 +21,37 @@ const favoriteBlog = (blogs) => {
   };
 };
 
+const mostBlogs = (blogs) => {
+  const authors = [];
+
+  const reducer = (output, current) => {
+    let authorObject = authors.find((obj) => obj.author === current.author);
+    if (!authorObject || typeof authorObject === "undefined") {
+      authorObject = { author: current.author, blogs: 1 };
+      authors.push(authorObject);
+    } else {
+      authorObject.blogs += 1;
+    }
+
+    if ( typeof output === "undefined" ) {
+      return output = authorObject;
+    }
+
+    if (output.blogs > current.blogs) {
+      return output;
+    } else {
+      return (output = authorObject);
+    }
+  };
+
+  const mostBlogs = blogs.reduce(reducer, authors[0]);
+  console.log(mostBlogs);
+  return mostBlogs;
+};
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogs,
 };
