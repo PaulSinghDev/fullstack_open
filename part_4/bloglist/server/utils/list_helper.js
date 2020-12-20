@@ -45,7 +45,7 @@ const mostBlogs = (blogs) => {
   };
 
   const mostBlogs = blogs.reduce(reducer, authors[0]);
-  console.log(mostBlogs);
+
   return mostBlogs;
 };
 
