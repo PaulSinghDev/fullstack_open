@@ -67,6 +67,36 @@ test("default likes", async () => {
   expect(result.likes).toBe(0);
 });
 
+test("no title", async () => {
+  const newBlog = {
+    author: "Jest",
+    likes: 2,
+    url: "https://makingstuffs.co.uk",
+  };
+
+  await api.post("/api/blogs").send(newBlog).expect(400);
+});
+
+test("no author", async () => {
+  const newBlog = {
+    title: "A Blog from Jest",
+    likes: 2,
+    url: "https://makingstuffs.co.uk",
+  };
+
+  await api.post("/api/blogs").send(newBlog).expect(400);
+});
+
+test("no url", async () => {
+  const newBlog = {
+    title: "A Blog from Jest",
+    author: "Jest",
+    likes: 2
+  };
+
+  await api.post("/api/blogs").send(newBlog).expect(400);
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });

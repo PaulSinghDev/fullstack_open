@@ -13,6 +13,19 @@ ApiRouter.get("/blogs", async (req, res) => {
 
 ApiRouter.post("/blogs", async (req, res) => {
   logger.info("Creating new entry");
+
+  if (typeof req.body.title) {
+    return res.status(400).json({ error: "No title" });
+  }
+
+  if (typeof req.body.author) {
+    return res.status(400).json({ error: "No author" });
+  }
+
+  if (typeof req.body.url) {
+    return res.status(400).json({ error: "No url" });
+  }
+
   const blog = new Blog(req.body);
   const newBlog = await blog.save();
 
