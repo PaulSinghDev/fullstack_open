@@ -3,7 +3,6 @@ const app = require("../app");
 const supertest = require("supertest");
 const initialBlogs = require("./blogs");
 const Blog = require("../models/Blog");
-const { init } = require("../app");
 
 /**
  * Create an api variable to test the app's
@@ -45,9 +44,27 @@ test("can post", async () => {
   await api.post("/api/blogs").send(newBlog);
 
   const blogs = (await api.get("/api/blogs")).body.map((blog) => blog.title);
-  
+
   expect(blogs.length).toBe(initialBlogs.length + 1);
   expect(blogs).toContain("A Blog From Jest");
+});
+
+test("default likes", async () => {
+  const newBlog = {
+    title: "A Blog From Jest",
+    author: "Jest",
+    url: "https://makingstuffs.co.uk",
+  };
+
+  const result = (
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(200)
+      .expect("Content-Type", /application\/json/)
+  ).body;
+
+  expect(result.likes).toBe(0);
 });
 
 afterAll(() => {
