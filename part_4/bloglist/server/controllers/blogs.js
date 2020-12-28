@@ -1,9 +1,8 @@
-const ApiRouter = require("express").Router();
-const Blog = require("../models/Blog");
+const blogsRouter = require("express").Router();
 const logger = require("../utils/logger");
-require("express-async-errors");
+const Blog = require("../models/blog");
 
-ApiRouter.get("/blogs", async (req, res) => {
+blogsRouter.get("/", async (req, res) => {
   logger.info("Getting all entries");
   const blogs = await Blog.find({});
   return blogs
@@ -11,7 +10,7 @@ ApiRouter.get("/blogs", async (req, res) => {
     : res.status(404).json({ error: "No blogs found" });
 });
 
-ApiRouter.get("/blogs/:id", async (req, res) => {
+blogsRouter.get("/:id", async (req, res) => {
   logger.info("Getting one entry");
   const blog = await Blog.findOne({ _id: req.params.id });
   return blog
@@ -19,7 +18,7 @@ ApiRouter.get("/blogs/:id", async (req, res) => {
     : res.status(404).json({ error: "No blogs found" });
 });
 
-ApiRouter.post("/blogs", async (req, res) => {
+blogsRouter.post("/", async (req, res) => {
   logger.info("Creating new entry");
 
   if (typeof req.body.title === "undefined") {
@@ -42,13 +41,13 @@ ApiRouter.post("/blogs", async (req, res) => {
     : res.status(400).json({ error: "Incorrect data" });
 });
 
-ApiRouter.delete("/blogs/:id", async (req, res) => {
+blogsRouter.delete("/:id", async (req, res) => {
   logger.info("Deleting one entry");
   const response = await Blog.deleteOne({ _id: req.params.id });
   res.status(200).json(response);
 });
 
-ApiRouter.put("/blogs/:id", async (req, res) => {
+blogsRouter.put("/:id", async (req, res) => {
   logger.info("Updating one entry");
   if (typeof req.params.id === "undefined") {
     return res.status(400).json({ error: "You must provide an ID" });
@@ -85,4 +84,4 @@ ApiRouter.put("/blogs/:id", async (req, res) => {
   return res.status(200).json(response);
 });
 
-module.exports = ApiRouter;
+module.exports = blogsRouter;
