@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const app = require("../app");
 const supertest = require("supertest");
 const helper = require("./testHelper");
@@ -14,6 +13,7 @@ const api = supertest(app);
  * Initialise the database;
  */
 beforeEach(async () => {
+  await helper.dbConnect();
   await Blog.deleteMany({});
   for (let blog of helper.initialBlogs) {
     const newBlog = new Blog(blog);
@@ -47,9 +47,8 @@ describe("get tests", () => {
       .get(`/api/blogs/${initialBlog.id}`)
       .expect(200)
       .expect("Content-Type", /application\/json/);
-      expect(blog.body).toEqual(initialBlog);
+    expect(blog.body).toEqual(initialBlog);
   });
-
 });
 
 describe("post tests", () => {
@@ -249,6 +248,4 @@ describe("put tests", () => {
   });
 });
 
-afterAll(() => {
-  mongoose.connection.close();
-});
+afterEach(async () => await helper.dbClose());
