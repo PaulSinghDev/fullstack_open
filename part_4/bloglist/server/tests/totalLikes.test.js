@@ -1,6 +1,6 @@
-const listHelper = require("../utils/list_helper");
+const totalLikes = require("../utils/list_helper").totalLikes;
 
-describe("Total Likes", () => {
+test("The list has only one blog", () => {
   const listWithOneBlog = [
     {
       _id: "5a422aa71b54a676234d17f8",
@@ -12,9 +12,6 @@ describe("Total Likes", () => {
       __v: 0,
     },
   ];
-
-  test("The list has only one blog", () => {
-    const result = listHelper.totalLikes(listWithOneBlog);
-    expect(result).toBe(5);
-  });
+  const result = totalLikes(listWithOneBlog);
+  expect(result).toBe(5);
 });

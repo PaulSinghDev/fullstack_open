@@ -1,11 +1,8 @@
-const listHelper = require("../utils/list_helper");
+const mostLikes = require("../utils/list_helper").mostLikes;
 const blogs = require("./blogs");
 
-describe("Most Likes", () => {
-  const result = listHelper.mostLikes(blogs);
-
-  test("List with multiple entries", () => {
-    expect(result.author).toBe("Edsger W. Dijkstra");
-    expect(result.likes).toBe(17);
-  });
+test("List with multiple entries", () => {
+  const result = mostLikes(blogs);
+  expect(result.author).toBe("Edsger W. Dijkstra");
+  expect(result.likes).toBe(17);
 });

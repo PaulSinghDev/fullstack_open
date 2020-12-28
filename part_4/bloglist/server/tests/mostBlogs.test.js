@@ -1,11 +1,8 @@
-const listHelper = require('../utils/list_helper');
+const mostBlogs = require("../utils/list_helper").mostBlogs;
 const blogs = require("./blogs");
 
-describe("Most Blogs", () => {
-    const result = listHelper.mostBlogs(blogs);
-
-    test("With ful list", () => {
-        expect(result.author).toBe("Robert C. Martin");
-        expect(result.blogs).toBe(3);
-    });
+test("With full list", () => {
+  const result = mostBlogs(blogs);
+  expect(result.author).toBe("Robert C. Martin");
+  expect(result.blogs).toBe(3);
 });
