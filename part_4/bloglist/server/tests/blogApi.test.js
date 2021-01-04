@@ -1,7 +1,8 @@
 const app = require("../app");
 const supertest = require("supertest");
 const helper = require("./testHelper");
-const Blog = require("../models/Blog");
+const Blog = require("../models/blog");
+const User = require('../models/user')
 
 /**
  * Create an api variable to test the app's
@@ -15,9 +16,14 @@ const api = supertest(app);
 beforeEach(async () => {
   await helper.dbConnect();
   await Blog.deleteMany({});
+  const users = await User.find({});
+
   for (let blog of helper.initialBlogs) {
     const newBlog = new Blog(blog);
-    await newBlog.save();
+    newBlog.user = users[0].id;
+    const savedBlog = await newBlog.save();
+    users[0].blogs = users[0].blogs.concat(savedBlog._id)
+    await users[0].save();
   }
 });
 
@@ -41,13 +47,14 @@ describe("get tests", () => {
     await api.get(`/api/blogs/${id}`).expect(404);
   });
   test("blog by id", async () => {
-    const initialBlog = (await helper.blogsInDb())[0];
+    const initialBlog = await helper.getBlogId();
 
     const blog = await api
-      .get(`/api/blogs/${initialBlog.id}`)
+      .get(`/api/blogs/${initialBlog}`)
       .expect(200)
       .expect("Content-Type", /application\/json/);
-    expect(blog.body).toEqual(initialBlog);
+
+    expect(blog.body.id).toEqual(initialBlog);
   });
 });
 
@@ -135,7 +142,7 @@ describe("put tests", () => {
     await api.put(`/api/blogs/`).expect(404);
   });
   test("no body", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
 
     const response = await api
       .put(`/api/blogs/${id}`)
@@ -145,7 +152,7 @@ describe("put tests", () => {
     expect(response.body.error).toMatch("Nothing to update");
   });
   test("invalid fields", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
     const obj = {
       wrong: "field",
     };
@@ -159,7 +166,7 @@ describe("put tests", () => {
     expect(response.body.error).toMatch("Nothing to update");
   });
   test("mixed validity", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
     const obj = {
       title: "A New Title",
       wrong: "Field",
@@ -175,7 +182,7 @@ describe("put tests", () => {
     expect(response.body.wrong).not.toBeDefined();
   });
   test("multiple fields", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
     const obj = {
       title: "A New Title",
       author: "A New Author",
@@ -191,7 +198,7 @@ describe("put tests", () => {
     expect(response.body.author).toMatch(obj.author);
   });
   test("update title", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
     const obj = {
       title: "A New Title",
     };
@@ -205,7 +212,7 @@ describe("put tests", () => {
     expect(response.body.title).toMatch(obj.title);
   });
   test("update author", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
     const obj = {
       author: "New Author",
     };
@@ -219,7 +226,7 @@ describe("put tests", () => {
     expect(response.body.author).toMatch(obj.author);
   });
   test("update likes", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
     const obj = {
       likes: 0,
     };
@@ -233,7 +240,7 @@ describe("put tests", () => {
     expect(response.body.likes).toEqual(obj.likes);
   });
   test("update url", async () => {
-    const id = helper.initialBlogs[0]._id;
+    const id = await helper.getBlogId();
     const obj = {
       url: "https://makingstuffs.co.uk",
     };

@@ -1,28 +1,28 @@
 const initialBlogs = require("./blogs");
 const mongoose = require("mongoose");
 const config = require("../utils/config");
-const app = require("../app");
-const supertest = require("supertest");
-
-const api = supertest(app);
 const Blog = require("../models/blog");
 const User = require("../models/user");
 
 const blogsInDb = async () =>
   (await Blog.find({})).map((blog) => blog.toJSON());
 
-const dbConnect = async () =>
+const dbConnect = async () => {
   await mongoose.connect(config.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
     useCreateIndex: true,
   });
-const dbClose = async () =>
+};
+const dbClose = async () => {
   await mongoose.connection.close();
+};
 
-const usersInDb = async () =>
-  (await User.find({})).map((user) => user.toJSON());
+const usersInDb = async () => {
+  const users = await User.find({});
+  return users.map((user) => user.toJSON());
+};
 
 const nonExistingId = async () => {
   const newBlog = {
@@ -38,11 +38,23 @@ const nonExistingId = async () => {
   return blog._id.toString();
 };
 
+const getBlogId = async () => {
+  const blogs = await blogsInDb();
+  return blogs[0].id;
+}
+
+const getUserId = async () => {
+  const users = await usersInDb();
+  return users[0].id;
+}
+
 module.exports = {
   initialBlogs,
   usersInDb,
   blogsInDb,
   nonExistingId,
   dbConnect,
-  dbClose
+  dbClose,
+  getBlogId,
+  getUserId
 };
