@@ -75,7 +75,7 @@ blogsRouter.delete("/:id", async (req, res) => {
   const blog = await Blog.findById(req.params.id);
 
   if ( !blog ) {
-    return res.status(401).json({ error: "No blog post found with the provided ID"})
+    return res.status(404).json({ error: "No blog post found with the provided ID"})
   }
 
 
@@ -87,7 +87,7 @@ blogsRouter.delete("/:id", async (req, res) => {
   const response = await Blog.deleteOne({ _id: req.params.id });
   return response.deletedCount === 1
     ? res.status(200).json({ message: "Deleted 1 blog" })
-    : res.status(401).json({ error: "There was a problem with the request" });
+    : res.status(400).json({ error: "There was a problem with the request" });
 });
 
 blogsRouter.put("/:id", async (req, res) => {
