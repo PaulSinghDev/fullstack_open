@@ -25,6 +25,8 @@ mongoose
   .then(() => logger.info("Connected to DB"))
   .catch((err) => logger.error(err));
 
+app.use(middleware.getJwtToken)
+
 app.use("/api/login", loginRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/blogs", blogsRouter);
