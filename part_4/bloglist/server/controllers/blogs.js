@@ -2,6 +2,8 @@ const blogsRouter = require("express").Router();
 const logger = require("../utils/logger");
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const middleware = require('../utils/middleware');
+const jwt = require('jsonwebtoken');
 
 blogsRouter.get("/", async (req, res) => {
   logger.info("Getting all entries");
@@ -25,6 +27,13 @@ blogsRouter.get("/:id", async (req, res) => {
 blogsRouter.post("/", async (req, res) => {
   logger.info("Creating new entry");
 
+  const token = middleware.getJwtToken(req);
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if ( !token || !decodedToken.id ) {
+    return res.status(401).json({ error: "Token missing or invalid" })
+  }
+
   if (typeof req.body.title === "undefined") {
     return res.status(400).json({ error: "No title" });
   }
@@ -37,14 +46,19 @@ blogsRouter.post("/", async (req, res) => {
     return res.status(400).json({ error: "No url" });
   }
 
-  const users = await User.find({});
-  req.body.user = users[0].id;
+  const user = await User.findById(decodedToken.id);
+  const blogObject = {
+    title: req.body.title,
+    author: req.body.author,
+    url: req.body.url,
+    user: user.id,
+  }
 
-  const blog = new Blog(req.body);
+  const blog = new Blog(blogObject);
   const newBlog = await blog.save();
 
-  users[0].blogs = users[0].blogs.concat(newBlog._id);
-  await users[0].save();
+  user.blogs = user.blogs.concat(newBlog._id);
+  await user.save();
 
   return newBlog
     ? res.status(200).json(newBlog)
