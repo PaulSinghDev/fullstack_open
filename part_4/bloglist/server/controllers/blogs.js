@@ -8,7 +8,7 @@ blogsRouter.get("/", async (req, res) => {
   const blogs = await Blog.find({}, (err, result) => {
     if (err) return err;
     return result;
-  }).populate("user");
+  }).populate("user", { username: 1, name: 1, id: 1});
   return blogs
     ? res.status(200).json(blogs)
     : res.status(404).json({ error: "No blogs found" });
