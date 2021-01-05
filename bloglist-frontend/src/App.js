@@ -9,6 +9,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [message, setMessage] = useState('')
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -18,9 +19,13 @@ const App = () => {
 
     if (localUser) {
       setUser(localUser)
+      blogService.setToken(localUser.token)
+      blogService
+        .getByUsername(localUser.username)
+        .then((data) => setBlogs(data))
     }
 
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    setTimeout(() => setMessage(''), 5000)
   }, [])
 
   const handleLogin = async (event) => {
@@ -30,24 +35,45 @@ const App = () => {
       const user = await loginService.login({ username, password })
       setUser(user)
       blogService.setToken(user.token)
+      blogService.getByUsername(user.username).then((data) => setBlogs(data))
       window.localStorage.setItem('loggedInUser', JSON.stringify(user))
       setPassword('')
       setUsername('')
+      setMessage('You have been logged in')
+      setTimeout(() => setMessage(''), 5000)
     } catch (error) {
       setErrorMessage('Wrong credentials')
       setTimeout(() => {
         setErrorMessage(null)
-      })
+      }, 5000)
     }
   }
 
   const handleLogout = () => {
     setUser(null)
+    setBlogs([])
+    setAuthor('')
+    setTitle('')
+    setUrl('')
     loginService.logout()
+    setMessage('You have been logged out')
+    setTimeout(() => setMessage(''), 5000)
   }
 
-  const handleBlogSubmit = async () => {
-    console.log('new')
+  const handleBlogSubmit = async (event) => {
+    event.preventDefault()
+    try {
+      const blog = await blogService.create({ title, author, url })
+      const newBlogs = blogs.concat(blog)
+      setBlogs(newBlogs)
+      setAuthor('')
+      setTitle('')
+      setUrl('')
+      setMessage('Blog created successfully')
+      setTimeout(() => setMessage(''), 5000)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const loginForm = () => (
@@ -120,9 +146,26 @@ const App = () => {
     </form>
   )
 
+  const modalPopup = (message, type) => {
+    const style = {
+      border: `1px solid ${type === 'error' ? 'red' : 'green'}`,
+      padding: '1rem',
+      margin: '1rem',
+      display: 'inline-block',
+      backgroundColor: `rgba(0,0,0,0.1)`,
+    }
+    return (
+      <div className="" style={style}>
+        {message}
+      </div>
+    )
+  }
+
   return (
     <div>
       {user ? blogForm() : loginForm()}
+      {message ? modalPopup(message, 'info') : null}
+      {errorMessage ? modalPopup(errorMessage, 'error') : null}
       {user !== null && blogList()}
     </div>
   )

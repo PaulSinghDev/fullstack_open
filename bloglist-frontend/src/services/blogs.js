@@ -10,4 +10,17 @@ const getAll = () => {
   return request.then((response) => response.data)
 }
 
-export default { getAll, setToken }
+const getByUsername = async (username) => {
+  const response = await axios.get(`${baseUrl}/${username}`)
+  return response.data
+}
+
+const create = async (blog) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const response = await axios.post(baseUrl, blog, config)
+  return response.data
+}
+
+export default { getAll, setToken, create, getByUsername }
