@@ -6,4 +6,12 @@ const login = async (credentials) => {
   return response.data
 }
 
-export default { login }
+const logout = () => window.localStorage.removeItem('loggedInUser')
+
+const checkForToken = () => {
+  const user = window.localStorage.getItem('loggedInUser')
+  if (!user) return null
+  return JSON.parse(user)
+}
+
+export default { login, checkForToken, logout }
