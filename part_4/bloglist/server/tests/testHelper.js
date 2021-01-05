@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const config = require("../utils/config");
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const bcrypt = require('bcrypt');
 
 const blogsInDb = async () =>
   (await Blog.find({})).map((blog) => blog.toJSON());
@@ -48,6 +49,28 @@ const getUserId = async () => {
   return users[0].id;
 }
 
+// Helper function to get JWT token
+const getJwtToken = async (api, username, password) => {
+  const response = await api
+    .post("/api/login/")
+    .send({ username, password })
+    .expect(200);
+
+  return response.body.token;
+};
+
+// Create a user 
+const createNewUser = async (username, password, name) => {
+  const passwordHash = await bcrypt.hash(password, 10);
+  const userObject = new User({
+    username,
+    name,
+    passwordHash,
+  });
+  const savedUser = await userObject.save();
+  return savedUser;
+}
+
 module.exports = {
   initialBlogs,
   usersInDb,
@@ -56,5 +79,7 @@ module.exports = {
   dbConnect,
   dbClose,
   getBlogId,
-  getUserId
+  getUserId,
+  getJwtToken,
+  createNewUser
 };

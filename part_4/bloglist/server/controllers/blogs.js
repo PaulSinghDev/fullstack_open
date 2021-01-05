@@ -6,10 +6,7 @@ const jwt = require("jsonwebtoken");
 
 blogsRouter.get("/", async (req, res) => {
   logger.info("Getting all entries");
-  const blogs = await Blog.find({}, (err, result) => {
-    if (err) return err;
-    return result;
-  }).populate("user", { username: 1, name: 1, id: 1 });
+  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1, id: 1 });
   return blogs
     ? res.status(200).json(blogs)
     : res.status(404).json({ error: "No blogs found" });
@@ -28,11 +25,10 @@ blogsRouter.post("/", async (req, res) => {
 
   const token = req.token;
   const decodedToken = jwt.verify(token, process.env.SECRET);
-
   if (!token || !decodedToken.id) {
     return res.status(401).json({ error: "Token missing or invalid" });
   }
-
+  
   if (typeof req.body.title === "undefined") {
     return res.status(400).json({ error: "No title" });
   }
@@ -60,31 +56,35 @@ blogsRouter.post("/", async (req, res) => {
   await user.save();
 
   return newBlog
-    ? res.status(200).json(newBlog)
+    ? res.status(200).json(newBlog.toJSON())
     : res.status(400).json({ error: "Incorrect data" });
 });
 
 blogsRouter.delete("/:id", async (req, res) => {
   const token = req.token;
   const decodedToken = jwt.verify(token, process.env.SECRET);
-
   if (!token || !decodedToken.id) {
     return res.status(401).json({ error: "Token missing or invalid" });
   }
 
   const blog = await Blog.findById(req.params.id);
-
   if ( !blog ) {
     return res.status(404).json({ error: "No blog post found with the provided ID"})
   }
-
+ 
 
   if ( blog.user.toString() !== decodedToken.id.toString() ) {
     return res.status(401).json({error: "Permission denied. You do not have the permission to delete this post."})
   }
 
-  logger.info("Deleting one entry");
   const response = await Blog.deleteOne({ _id: req.params.id });
+
+  const user = await User.findById(blog.user._id);
+
+  user.blogs = user.blogs.filter(blog => blog._id !== req.params.id)
+
+  await user.save();
+
   return response.deletedCount === 1
     ? res.status(200).json({ message: "Deleted 1 blog" })
     : res.status(400).json({ error: "There was a problem with the request" });
