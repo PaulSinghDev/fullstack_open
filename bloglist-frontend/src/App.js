@@ -73,7 +73,7 @@ const App = () => {
       padding: '1rem',
       margin: '1rem',
       display: 'inline-block',
-      backgroundColor: `rgba(0,0,0,0.1)`,
+      backgroundColor: 'rgba(0,0,0,0.1)',
     }
     return (
       <div className="" style={style}>
@@ -95,7 +95,7 @@ const App = () => {
       {message ? modalPopup(message, 'info') : null}
       {errorMessage ? modalPopup(errorMessage, 'error') : null}
       {user === null && (
-        <Togglable label="Login" ref={loginFormRef}>
+        <Togglable buttonLabel="Login" ref={loginFormRef}>
           <LoginForm login={login} />
         </Togglable>
       )}
@@ -109,7 +109,7 @@ const App = () => {
             <button onClick={handleLogout}>Logout</button>
           </div>
           <h2 style={{ textAlign: 'center' }}>Blog Posts</h2>
-          <Togglable label="New Blog" ref={newBlogForm}>
+          <Togglable buttonLabel="New Blog" ref={newBlogForm}>
             <NewBlogForm createBlog={createBlog} />
           </Togglable>
           <BlogList blogs={blogs} deleteBlog={deleteBlog} />

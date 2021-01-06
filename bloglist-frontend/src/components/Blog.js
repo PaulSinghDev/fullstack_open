@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
+import PropTypes from 'prop-types'
 
 const Blog = ({ blog, deleteBlog }) => {
   const [showDetails, setShowDetails] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
-  const toggleDetails = (event) => setShowDetails(!showDetails)
+  const toggleDetails = () => setShowDetails(!showDetails)
   const likePost = async (event) => {
     event.preventDefault()
-    const updatedPost = await blogService.update({ ...blog, likes: likes + 1 })
+    await blogService.update({ ...blog, likes: likes + 1 })
     setLikes(likes + 1)
-    console.log(updatedPost)
   }
 
   const deletePost = async (event) => {
@@ -55,6 +55,11 @@ const Blog = ({ blog, deleteBlog }) => {
       </div>
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
 }
 
 export default Blog
