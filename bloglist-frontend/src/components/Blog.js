@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
+import Togglable from './Togglable'
 
 const Blog = ({ blog, deleteBlog }) => {
-  const [showDetails, setShowDetails] = useState(false)
   const [likes, setLikes] = useState(blog.likes)
 
-  const toggleDetails = () => setShowDetails(!showDetails)
   const likePost = async (event) => {
     event.preventDefault()
     await blogService.update({ ...blog, likes: likes + 1 })
@@ -19,13 +18,14 @@ const Blog = ({ blog, deleteBlog }) => {
   }
 
   return (
-    <div
+    <li
       style={{
         padding: 5,
         margin: 5,
         fontSize: 16,
         textTransform: 'capitalize',
       }}
+      className="blog"
     >
       <p style={{ fontWeight: 'bold', color: 'rgba(0,0,0,0.9)', fontSize: 16 }}>
         {blog.title} -{' '}
@@ -35,25 +35,24 @@ const Blog = ({ blog, deleteBlog }) => {
           {blog.author}
         </span>
       </p>
-      <button onClick={toggleDetails}>
-        {showDetails ? 'Hide' : 'Show'} Details
-      </button>
-      <div
-        style={{
-          display: showDetails ? 'flex' : 'none',
-          flexDirection: 'column',
-        }}
-      >
-        <p style={{ fontSize: 12 }}>
-          URL: <a href="{blog.url}">{blog.url}</a>
-        </p>
-        <p>
-          Likes: {likes}
-          <button onClick={likePost}>Like</button>
-        </p>
-        <button onClick={deletePost}>Delete</button>
-      </div>
-    </div>
+      <Togglable buttonLabel="Show More...">
+        <div
+          className="blog-details"
+          style={{
+            flexDirection: 'column',
+          }}
+        >
+          <p style={{ fontSize: 12 }}>
+            URL: <a href="{blog.url}">{blog.url}</a>
+          </p>
+          <p>
+            Likes: {likes}
+            <button onClick={likePost}>Like</button>
+          </p>
+          <button onClick={deletePost}>Delete</button>
+        </div>
+      </Togglable>
+    </li>
   )
 }
 
