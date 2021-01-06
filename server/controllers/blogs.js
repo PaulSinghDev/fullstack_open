@@ -24,6 +24,7 @@ blogsRouter.get('/:user', async (req, res) => {
       author: 1,
       url: 1,
       likes: 1,
+      user: 1,
     })
   )[0]
   if (!user) return res.status(404).json({ error: 'No user with that name' })
@@ -130,6 +131,8 @@ blogsRouter.put('/:id', async (req, res) => {
       case 'likes':
         break
       case 'url':
+        break
+      case 'user':
         break
       default:
         const index = keys.indexOf(key)

@@ -1,8 +1,60 @@
-import React from 'react'
-const Blog = ({ blog }) => (
-  <div>
-    {blog.title} {blog.author}
-  </div>
-)
+import React, { useState } from 'react'
+import blogService from '../services/blogs'
+
+const Blog = ({ blog, deleteBlog }) => {
+  const [showDetails, setShowDetails] = useState(false)
+  const [likes, setLikes] = useState(blog.likes)
+
+  const toggleDetails = (event) => setShowDetails(!showDetails)
+  const likePost = async (event) => {
+    event.preventDefault()
+    const updatedPost = await blogService.update({ ...blog, likes: likes + 1 })
+    setLikes(likes + 1)
+    console.log(updatedPost)
+  }
+
+  const deletePost = async (event) => {
+    event.preventDefault()
+    await deleteBlog(blog.id)
+  }
+
+  return (
+    <div
+      style={{
+        padding: 5,
+        margin: 5,
+        fontSize: 16,
+        textTransform: 'capitalize',
+      }}
+    >
+      <p style={{ fontWeight: 'bold', color: 'rgba(0,0,0,0.9)', fontSize: 16 }}>
+        {blog.title} -{' '}
+        <span
+          style={{ fontWeight: 'normal', fontStyle: 'italic', fontSize: 12 }}
+        >
+          {blog.author}
+        </span>
+      </p>
+      <button onClick={toggleDetails}>
+        {showDetails ? 'Hide' : 'Show'} Details
+      </button>
+      <div
+        style={{
+          display: showDetails ? 'flex' : 'none',
+          flexDirection: 'column',
+        }}
+      >
+        <p style={{ fontSize: 12 }}>
+          URL: <a href="{blog.url}">{blog.url}</a>
+        </p>
+        <p>
+          Likes: {likes}
+          <button onClick={likePost}>Like</button>
+        </p>
+        <button onClick={deletePost}>Delete</button>
+      </div>
+    </div>
+  )
+}
 
 export default Blog
