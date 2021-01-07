@@ -21,9 +21,9 @@ const Blog = ({ blog, deleteBlog }) => {
     <li
       style={{
         padding: 5,
-        margin: 5,
         fontSize: 16,
         textTransform: 'capitalize',
+        margin: 0,
       }}
       className="blog"
     >
@@ -47,9 +47,13 @@ const Blog = ({ blog, deleteBlog }) => {
           </p>
           <p>
             Likes: {likes}
-            <button onClick={likePost}>Like</button>
+            <button className="like-button" onClick={likePost}>
+              Like
+            </button>
           </p>
-          <button onClick={deletePost}>Delete</button>
+          <button className="delete-blog" onClick={deletePost}>
+            Delete
+          </button>
         </div>
       </Togglable>
     </li>

@@ -6,11 +6,13 @@ const jwt = require('jsonwebtoken')
 const middleware = require('../utils/middleware')
 
 blogsRouter.get('/', async (req, res) => {
-  const blogs = await Blog.find({}).populate('user', {
-    username: 1,
-    name: 1,
-    id: 1,
-  })
+  const blogs = await Blog.find({})
+    .populate('user', {
+      username: 1,
+      name: 1,
+      id: 1,
+    })
+    .sort({ likes: 'desc' })
   return blogs
     ? res.status(200).json(blogs)
     : res.status(404).json({ error: 'No blogs found' })
@@ -41,7 +43,6 @@ blogsRouter.get('/:id', async (req, res) => {
 
 blogsRouter.post('/', async (req, res) => {
   logger.info('Creating new entry')
-
   const token = req.token
   const decodedToken = jwt.verify(token, process.env.SECRET)
   if (!token || !decodedToken.id) {
@@ -61,6 +62,7 @@ blogsRouter.post('/', async (req, res) => {
   }
 
   const user = await User.findById(decodedToken.id)
+
   const blogObject = {
     title: req.body.title,
     author: req.body.author,
@@ -121,6 +123,8 @@ blogsRouter.put('/:id', async (req, res) => {
 
   const body = req.body
   const keys = Object.keys(body)
+
+  body.user = body.user.id
 
   for (let key of keys) {
     switch (key) {

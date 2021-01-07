@@ -12,30 +12,27 @@ const App = () => {
   const [message, setMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const newBlogForm = useRef()
-  const loginFormRef = useRef()
 
   useEffect(() => {
     const localUser = loginService.checkForToken()
-
     if (localUser) {
       setUser(localUser)
       blogService.setToken(localUser.token)
-      blogService
-        .getByUsername(localUser.username)
-        .then((data) => setBlogs(data))
     }
+  }, [])
 
-    setTimeout(() => setMessage(''), 5000)
+  useEffect(() => {
+    blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
 
   const login = async (details) => {
     try {
-      const user = await loginService.login(details)
-      setUser(user)
-      blogService.setToken(user.token)
-      const blogList = await blogService.getByUsername(user.username)
+      const loggedInUser = await loginService.login(details)
+      setUser(loggedInUser)
+      blogService.setToken(loggedInUser.token)
+      const blogList = await blogService.getByUsername(loggedInUser.username)
       setBlogs(blogList)
-      window.localStorage.setItem('loggedInUser', JSON.stringify(user))
+      window.localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser))
       setMessage('You have been logged in')
       setTimeout(() => setMessage(''), 5000)
     } catch (error) {
@@ -48,23 +45,17 @@ const App = () => {
 
   const handleLogout = () => {
     setUser(null)
-    setBlogs([])
     loginService.logout()
     setMessage('You have been logged out')
     setTimeout(() => setMessage(''), 5000)
   }
 
-  const createBlog = async (newBlog) => {
-    try {
-      newBlogForm.current.toggleVisibility()
-      const blog = await blogService.create(newBlog)
-      const newBlogsList = blogs.concat(blog)
-      setBlogs(newBlogsList)
+  const createBlog = (newBlog) => {
+    newBlogForm.current.toggleVisibility()
+    blogService.create(newBlog).then((returnedBlog) => {
+      setBlogs(blogs.concat(returnedBlog))
       setMessage('Blog created successfully')
-      setTimeout(() => setMessage(''), 5000)
-    } catch (error) {
-      console.log(error)
-    }
+    })
   }
 
   const modalPopup = (message, type) => {
@@ -76,7 +67,7 @@ const App = () => {
       backgroundColor: 'rgba(0,0,0,0.1)',
     }
     return (
-      <div className="" style={style}>
+      <div className="notification-modal" style={style}>
         {message}
       </div>
     )
@@ -84,37 +75,49 @@ const App = () => {
 
   const deleteBlog = async (id) => {
     if (window.confirm('Are you sure you with to delete the post?')) {
-      await blogService.remove(id)
-      const newBlogsList = blogs.filter((blog) => blog.id !== id)
-      setBlogs(newBlogsList)
+      try {
+        const response = await blogService.remove(id)
+        const newBlogsList = blogs.filter((blog) => blog.id !== id)
+        setBlogs(newBlogsList)
+      } catch (error) {
+        if (error.response.status === 401) {
+          setErrorMessage(error.response.data.error)
+          setTimeout(() => setErrorMessage(''), 5000)
+        }
+      }
     }
   }
 
   return (
-    <div style={{ fontFamily: 'roboto' }}>
+    <div style={{ fontFamily: 'roboto', textAlign: 'center' }}>
+      <h1>Simple Blog List</h1>
       {message ? modalPopup(message, 'info') : null}
       {errorMessage ? modalPopup(errorMessage, 'error') : null}
+
       {user === null && (
-        <Togglable buttonLabel="Login" ref={loginFormRef}>
-          <LoginForm login={login} />
-        </Togglable>
+        <div style={{ margin: '4rem 2rem' }}>
+          <h2>You're Currently Logged Out</h2>
+          <Togglable buttonLabel="Show Login">
+            <LoginForm login={login} />
+          </Togglable>
+        </div>
       )}
+
       {user !== null && (
-        <>
-          <div>
-            <h2>Your account</h2>
-            <p>
-              You are logged in as <strong>{user.username}</strong>
-            </p>
-            <button onClick={handleLogout}>Logout</button>
-          </div>
-          <h2 style={{ textAlign: 'center' }}>Blog Posts</h2>
+        <div className="account-information" style={{ margin: '4rem 2rem' }}>
+          <h2>Your account</h2>
+          <p>
+            You are logged in as <strong>{user.username}</strong>
+          </p>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
           <Togglable buttonLabel="New Blog" ref={newBlogForm}>
             <NewBlogForm createBlog={createBlog} />
           </Togglable>
-          <BlogList blogs={blogs} deleteBlog={deleteBlog} />
-        </>
+        </div>
       )}
+      <BlogList title="All Blog Posts" blogs={blogs} deleteBlog={deleteBlog} />
     </div>
   )
 }
