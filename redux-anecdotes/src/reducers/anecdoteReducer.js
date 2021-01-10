@@ -1,5 +1,4 @@
-import { getInitialState, asObject } from './reducer_helper'
-export const initialState = getInitialState()
+import { asObject } from './reducer_helper'
 
 export const vote = (id) => {
   return {
@@ -19,8 +18,17 @@ export const create = (content) => {
   }
 }
 
-const anecdoteReducer = (state = initialState, action) => {
+export const initializeAnecdotes = (anecdotes) => {
+  return {
+    type: 'INIT_ANECDOTES',
+    payload: { anecdotes },
+  }
+}
+
+const anecdoteReducer = (state = [], action) => {
   switch (action.type) {
+    case 'INIT_ANECDOTES':
+      return action.payload.anecdotes
     case 'VOTE':
       const id = action.payload.id
       const anecdote = state.find((item) => item.id === id)
@@ -28,7 +36,7 @@ const anecdoteReducer = (state = initialState, action) => {
         item.id !== id ? item : { ...anecdote, votes: anecdote.votes + 1 }
       )
     case 'CREATE':
-      return state.concat(asObject(action.payload.content))
+      return state.concat(action.payload.content)
     default:
       return state
   }
