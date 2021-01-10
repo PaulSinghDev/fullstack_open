@@ -1,25 +1,36 @@
+import anecdoteService from '../services/anecdotes'
+
 export const vote = (id) => {
-  return {
-    type: 'VOTE',
-    payload: {
-      id,
-    },
+  return async (dispatch) => {
+    const updatedAnecdote = await anecdoteService.vote(id)
+    dispatch({
+      type: 'VOTE',
+      payload: {
+        ...updatedAnecdote,
+      },
+    })
   }
 }
 
 export const create = (content) => {
-  return {
-    type: 'CREATE',
-    payload: {
-      content,
-    },
+  return async (dispatch) => {
+    const newAnecdote = await anecdoteService.createNew(content)
+    dispatch({
+      type: 'CREATE',
+      payload: {
+        ...newAnecdote,
+      },
+    })
   }
 }
 
 export const initializeAnecdotes = (anecdotes) => {
-  return {
-    type: 'INIT_ANECDOTES',
-    payload: { anecdotes },
+  return async (dispatch) => {
+    const anecdotes = await anecdoteService.getAll()
+    dispatch({
+      type: 'INIT_ANECDOTES',
+      payload: { anecdotes },
+    })
   }
 }
 
@@ -28,13 +39,10 @@ const anecdoteReducer = (state = [], action) => {
     case 'INIT_ANECDOTES':
       return action.payload.anecdotes
     case 'VOTE':
-      const id = action.payload.id
-      const anecdote = state.find((item) => item.id === id)
-      return state.map((item) =>
-        item.id !== id ? item : { ...anecdote, votes: anecdote.votes + 1 }
-      )
+      const anecdote = action.payload
+      return state.map((item) => (item.id !== anecdote.id ? item : anecdote))
     case 'CREATE':
-      return state.concat(action.payload.content)
+      return state.concat(action.payload)
     default:
       return state
   }
