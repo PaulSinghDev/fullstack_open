@@ -1,5 +1,3 @@
-import { asObject } from './reducer_helper'
-
 export const vote = (id) => {
   return {
     type: 'VOTE',
