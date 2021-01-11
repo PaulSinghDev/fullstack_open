@@ -1,7 +1,12 @@
 export const setNotification = (notification, timeout) => {
+  let timeoutId
   return async (dispatch) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeout *= 0.5
+    }
     dispatch({ type: 'SET_NOTIFICATION', payload: notification })
-    await setTimeout(() => {
+    timeoutId = setTimeout(() => {
       dispatch({ type: 'RESET', payload: '' })
     }, timeout * 1000)
   }
