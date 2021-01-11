@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { useResource } from '../hooks'
+import React from 'react'
 
 const NoteList = ({ notes }) => {
   return (
