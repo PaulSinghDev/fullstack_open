@@ -15,6 +15,7 @@ const Navigation = () => {
 
   return (
     <div id="navigation" className="main-menu">
+      <h1>Simple Blog List</h1>
       <div className="menu-links">
         <Link to="/">Home</Link>
         <Link to="/users">Users</Link>

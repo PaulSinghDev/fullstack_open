@@ -1,7 +1,8 @@
-import React from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { registerUser } from '../../reducers/authReducer'
 import { useField } from '../../hooks'
+import { useHistory } from 'react-router-dom'
 
 const RegisterForm = () => {
   const dispatch = useDispatch()
@@ -9,10 +10,18 @@ const RegisterForm = () => {
   const username = useField('text', 'username')
   const name = useField('text', 'name')
   const password = useField('password', 'password')
+  const user = useSelector((state) => state.auth)
+  let history = useHistory()
 
   const { reset: resetUsername, ...usernameOptions } = username
   const { reset: resetName, ...nameOptions } = name
   const { reset: resetPassword, ...passwordOptions } = password
+
+  useEffect(() => {
+    if (user) {
+      return history.push(`/user/${user.id}`)
+    }
+  }, [user])
 
   const handleSubmit = (event) => {
     event.preventDefault()

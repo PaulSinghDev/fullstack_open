@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
       ref: 'Comment',
     },
   ],
+  created: {
+    type: Date,
+    default: new Date(),
+  },
 })
 
 userSchema.set('toJSON', {

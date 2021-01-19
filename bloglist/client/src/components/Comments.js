@@ -1,16 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import CommentForm from './forms/CommentForm'
 
-const Comments = () => {
+const Comments = ({ blog }) => {
+  let comments = blog.comments
   return (
     <div className="comments-wrapper">
-      <h3>Comments</h3>
-      <ul className="comments-list">
-        <li className="comment-list-item">
-          <p>
-            Hey - <span>User</span>
-          </p>
-        </li>
-      </ul>
+      <CommentForm blogId={blog.id} />
+      <div className="comment-list-container">
+        <h3>Comments</h3>
+        {comments && comments.length > 0 ? (
+          <ul className="comments-list">
+            {comments.map((comment) => (
+              <li key={comment.id}>{comment.comment}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No comments to display. Be the first to comment.</p>
+        )}
+      </div>
     </div>
   )
 }

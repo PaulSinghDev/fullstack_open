@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { initUserlist } from '../reducers/userlistReducer'
+import UserCard from './UserCard'
 
 const Users = () => {
   const dispatch = useDispatch()
@@ -18,11 +19,7 @@ const Users = () => {
           {userlist &&
             userlist.map((user) => (
               <li className="userlist-item" key={user.id}>
-                <Link to={`/user/${user.id}`}>
-                  <h3>{user.name}</h3>
-                </Link>
-                <p>({user.username})</p>
-                <p>Posts: {user.blogs.length}</p>
+                <UserCard user={user} />
               </li>
             ))}
         </ul>

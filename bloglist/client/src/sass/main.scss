@@ -65,8 +65,8 @@ a {
   border: 2px solid transparent;
 
   &:hover {
-    background-color: $purple;
-    color: $white;
+    background-color: $purple !important;
+    color: $white !important;
   }
 
   &:focus {
@@ -84,6 +84,10 @@ a {
 h1 {
   margin: 0;
   font-size: 1.6rem;
+}
+
+p {
+  overflow: auto;
 }
 
 h3,
@@ -118,10 +122,27 @@ a h1 {
 
 .main-menu {
   padding: 0.5rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 
   .menu-links {
     display: flex;
     justify-content: space-evenly;
+    margin-left: 1rem;
+    align-items: center;
+
+    a {
+      margin: 0 0.5rem;
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
   }
 
   .logged-in-view,
@@ -132,6 +153,7 @@ a h1 {
     justify-content: center;
     text-align: center;
     margin: 1rem 0;
+    flex-basis: 100%;
 
     .register-user,
     .login-form {
@@ -155,6 +177,7 @@ a h1 {
   }
 }
 
+.new-comment-form,
 .register-user,
 .login-form,
 .new-blog-form {
@@ -164,7 +187,7 @@ a h1 {
   @include boxShadow();
   max-width: 500px;
   margin: auto;
-  width: 90%;
+  width: 90vw;
   color: $black;
 
   .form-input {
@@ -182,17 +205,15 @@ a h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 4rem 1rem;
 
   ul {
     list-style: none;
     padding: 0;
   }
 
-  .comment-list-item,
+  .comment-list-container,
   .user-card,
   .blog-page-item,
-  .userlist-item,
   .blog-list-item {
     @include borderRadius();
     @include boxShadow();
@@ -202,6 +223,34 @@ a h1 {
     color: $black;
     max-width: 500px;
     width: 90vw;
+  }
+
+  .blog-page-item {
+    display: flex;
+    flex-direction: column;
+    h2 {
+      align-self: center;
+    }
+    .details {
+      width: auto;
+      align-self: center;
+      p {
+        margin: 1rem 0;
+        line-height: auto;
+
+        text-align: left;
+        span {
+          background-color: $purple;
+          color: $white;
+          @include borderRadius();
+          padding: 0 0.5rem;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+    .buttons {
+      margin: 2rem 0;
+    }
   }
 }
 
@@ -254,10 +303,19 @@ a h1 {
     padding: 1rem;
     width: 90%;
     color: $black;
-    max-width: 500px;
+    max-width: 800px;
     margin: 4rem auto;
     transition: opacity 0.3s ease;
     border: 3px solid transparent;
+
+    h3 {
+      font-size: 1.4rem;
+      margin: 0 0 2rem;
+      clear: both;
+    }
+    p {
+      font-size: 1.2rem;
+    }
   }
 
   &[aria-hidden='true'] {
@@ -294,6 +352,7 @@ a h1 {
     @include borderRadius();
     @include boxShadow();
     display: none;
+    z-index: 11;
 
     &::before {
       width: 1rem;
@@ -311,5 +370,69 @@ a h1 {
   &:focus .tooltip-dropdown,
   &:hover .tooltip-dropdown {
     display: block;
+  }
+}
+
+.comments-wrapper {
+  margin: 0 1rem;
+}
+
+.user-card {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+
+  .user-thumb {
+    min-width: 75px;
+    max-width: 150px;
+    width: 25%;
+    flex-grow: 1;
+    img {
+      display: block;
+      clear: both;
+      width: 100%;
+      object-fit: cover;
+    }
+    p {
+      font-size: 1.2rem;
+      margin: 1.5rem 0 0rem 0;
+    }
+  }
+
+  .user-content {
+    margin-left: 1rem;
+    flex-basis: 100px;
+    flex-grow: 1;
+
+    .heading {
+      h2 {
+        font-size: 1.6rem;
+        text-transform: capitalize;
+        margin: 1rem 0 1rem 0;
+      }
+      p {
+        font-size: 1rem;
+      }
+    }
+
+    .content {
+      display: inline-block;
+      text-align: left;
+
+      p {
+        margin: 0;
+        line-height: 1.5;
+        font-size: 1.2rem;
+        color: rgba($black, 0.8);
+        span {
+          background-color: $purple;
+          color: rgba($white, 0.9);
+          padding: 0 0.5rem;
+          margin-right: 1ch;
+
+          @include borderRadius();
+        }
+      }
+    }
   }
 }

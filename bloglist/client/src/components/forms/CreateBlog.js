@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useField } from '../../hooks'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { createBlog } from '../../reducers/bloglistReducer'
+import { useHistory } from 'react-router-dom'
 
 const NewBlogForm = () => {
   const dispatch = useDispatch()
+  const auth = useSelector((state) => state.auth)
+  const history = useHistory()
+
   const title = useField('text', 'title')
   const author = useField('text', 'author')
   const url = useField('text', 'url')
@@ -26,6 +30,12 @@ const NewBlogForm = () => {
     resetTitle()
     resetUrl()
   }
+
+  useEffect(() => {
+    if (!auth) {
+      history.push('/login')
+    }
+  }, [auth])
 
   return (
     <div className="new-blog-form" aria-hidden="true">

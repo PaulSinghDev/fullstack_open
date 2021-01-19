@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useField } from '../../hooks'
 import { loginUser } from '../../reducers/authReducer'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 
 const LoginForm = () => {
+  const auth = useSelector((state) => state.auth)
+  const history = useHistory()
+
   const dispatch = useDispatch()
 
   const username = useField('text', 'username')
@@ -16,6 +20,12 @@ const LoginForm = () => {
     event.preventDefault()
     dispatch(loginUser({ username: username.value, password: password.value }))
   }
+
+  useEffect(() => {
+    if (auth) {
+      history.push(`/user/${auth.id}`)
+    }
+  }, [auth])
 
   return (
     <div className="login-form">

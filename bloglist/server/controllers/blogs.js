@@ -121,6 +121,7 @@ blogsRouter.put('/:id', async (req, res) => {
   const keys = Object.keys(body)
 
   body.user = body.user.id || body.user
+  body.comments = body.comments.map((comment) => comment.id)
 
   for (let key of keys) {
     switch (key) {
@@ -134,6 +135,12 @@ blogsRouter.put('/:id', async (req, res) => {
         break
       case 'user':
         break
+      case 'comments':
+        break
+      case 'created':
+        break
+      case 'id':
+        break
       default:
         const index = keys.indexOf(key)
         keys.splice(index, 1)
@@ -144,12 +151,13 @@ blogsRouter.put('/:id', async (req, res) => {
 
   if (keys.length === 0)
     return res.status(400).json({ error: 'Nothing to update' })
-  console.log(body)
-  const response = await Blog.findByIdAndUpdate(req.params.id, body, {
-    new: true,
-  })
 
-  return res.status(200).json(response)
+  await Blog.findByIdAndUpdate(req.params.id, body)
+  const updated = await Blog.findById(body.id)
+    .populate('user', { username: 1, name: 1, id: 1 })
+    .populate('comments', { comment: 1, created: 1, id: 1 })
+
+  return res.status(200).json(updated)
 })
 
 blogsRouter.post('/:id/comment', async (req, res) => {
@@ -173,4 +181,13 @@ blogsRouter.post('/:id/comment', async (req, res) => {
   await blog.save()
   return res.status(200).json({ comment: dbComment })
 })
+
+blogsRouter.get('/:id/comments', async (req, res) => {
+  const comments = await Comment.find({ blog: req.params.id })
+  if (!comments) {
+    return res.status(400).json({ error: 'No comments found for this post' })
+  }
+  return res.status(200).json({ comments: [...comments] })
+})
+
 module.exports = blogsRouter

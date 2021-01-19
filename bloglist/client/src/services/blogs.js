@@ -59,6 +59,16 @@ const checkForToken = () => {
   return JSON.parse(user)
 }
 
+const postComment = async (id, comment) => {
+  const response = await axios.post(`${baseUrl}/${id}/comment`, { comment })
+  return response.data
+}
+
+const getComments = async (id) => {
+  const response = await axios.get(`${baseUrl}/${id}/comments`)
+  return response.data
+}
+
 export default {
   getAll,
   setToken,
@@ -69,4 +79,6 @@ export default {
   checkForToken,
   getByUserId,
   getById,
+  postComment,
+  getComments,
 }

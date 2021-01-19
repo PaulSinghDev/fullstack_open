@@ -34,7 +34,7 @@ export const deleteBlog = (blog) => {
         type: 'DELETE_BLOG',
         payload: blog,
       })
-      resetTimer(dispatch, 10)
+      resetTimer(dispatch, 10, '/')
     } catch (error) {
       dispatch({
         type: 'DELETE_POST_FAIL',
@@ -71,7 +71,9 @@ export const updateBlog = (blog) => {
 
 export const likeBlog = (blog) => {
   return async (dispatch) => {
+    blog.likes = blog.likes + 1
     const payload = await blogService.update(blog)
+    console.log(payload)
     dispatch({
       type: 'LIKE_BLOG',
       payload,
@@ -92,8 +94,26 @@ export const getById = (id) => {
   }
 }
 
+export const postComment = (id, comment) => {
+  return async (dispatch) => {
+    const commentWithId = await blogService.postComment(id, comment)
+    dispatch({
+      type: 'POST_COMMENT',
+      payload: {
+        bloglist: commentWithId.comment,
+      },
+    })
+  }
+}
+
 const bloglistReducer = (state = [], action) => {
   switch (action.type) {
+    case 'POST_COMMENT':
+      const newState = [...state]
+      newState[0].comments = newState[0].comments.concat(
+        action.payload.bloglist
+      )
+      return newState
     case 'CREATE_BLOG':
       return state.concat(action.payload)
     case 'DELETE_BLOG':

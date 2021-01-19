@@ -21,7 +21,6 @@ const App = () => {
     <div style={{ fontFamily: 'roboto', textAlign: 'center' }}>
       <Navigation />
       <Notification />
-      <h1>Simple Blog List</h1>
       <Switch>
         <Route path="/user/:id">
           <User id={userId} />
