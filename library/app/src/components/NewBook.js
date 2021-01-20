@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { ADD_BOOK, ALL_BOOKS } from '../queries/books'
 import { ALL_AUTHORS } from '../queries/authors'
-import { MY_RECOMMENDATIONS } from '../queries/auth'
 
 const NewBook = ({ setError }) => {
   const [title, setTitle] = useState('')
