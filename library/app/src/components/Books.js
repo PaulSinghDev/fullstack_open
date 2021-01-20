@@ -8,9 +8,10 @@ const Books = (props) => {
 
   useEffect(() => {
     if (result.data) {
+      console.log(books)
       setBooks(result.data.allBooks)
     }
-  }, [result])
+  }, [books, result])
 
   if (!props.show) {
     return null
@@ -34,7 +35,7 @@ const Books = (props) => {
           {books.map((a) => (
             <tr key={a.title}>
               <td>{a.title}</td>
-              <td>{a.author}</td>
+              <td>{a.author.name}</td>
               <td>{a.published}</td>
             </tr>
           ))}
