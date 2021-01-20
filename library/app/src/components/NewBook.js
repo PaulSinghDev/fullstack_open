@@ -2,20 +2,45 @@ import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { ADD_BOOK, ALL_BOOKS } from '../queries/books'
 import { ALL_AUTHORS } from '../queries/authors'
+import { MY_RECOMMENDATIONS } from '../queries/auth'
 
-const NewBook = (props) => {
+const NewBook = ({ setError }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const [createBook] = useMutation(ADD_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
-  })
+    onError: (err) => setError(err.message),
+    update: (store, response) => {
+      const authorsInStore = store.readQuery({ query: ALL_AUTHORS })
+      const booksInStore = store.readQuery({ query: ALL_BOOKS })
 
-  if (!props.show) {
-    return null
-  }
+      store.writeQuery({
+        query: ALL_BOOKS,
+        data: {
+          ...booksInStore,
+          allBooks: [...booksInStore.allBooks, response.data.addBook],
+        },
+      })
+
+      const authorObject = authorsInStore.allAuthors.find(
+        (a) => a.name === response.data.addBook.author.name
+      )
+      if (!authorObject) {
+        store.writeQuery({
+          query: ALL_AUTHORS,
+          data: {
+            ...authorsInStore,
+            allAuthors: [
+              ...authorsInStore.allAuthors,
+              response.data.addBook.author,
+            ],
+          },
+        })
+      }
+    },
+  })
 
   const submit = (event) => {
     event.preventDefault()

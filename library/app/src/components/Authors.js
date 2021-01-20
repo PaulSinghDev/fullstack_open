@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { ALL_AUTHORS, EDIT_BORN_YEAR } from '../queries/authors'
 
-const Authors = (props) => {
+const Authors = ({ show, token }) => {
   const [authors, setAuthors] = useState([])
   const [selectedAuthor, setSelectedAuthor] = useState('')
   const [birthYear, setBirthYear] = useState('')
@@ -18,7 +18,7 @@ const Authors = (props) => {
     }
   }, [result])
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
@@ -58,41 +58,43 @@ const Authors = (props) => {
           </tbody>
         </table>
       </div>
-      <div>
-        <h3>Set Birth Year</h3>
-        <form
-          onSubmit={handleAddAuthor}
-          style={{ display: 'flex', flexDirection: 'column' }}
-        >
-          <label>
-            Name:
-            <select
-              value={selectedAuthor}
-              onChange={(event) => setSelectedAuthor(event.target.value)}
-            >
-              <option default value="">
-                Select Author...
-              </option>
-              {authors.map((a) => (
-                <option key={a.id} value={a.name}>
-                  {a.name}
+      {token && (
+        <div>
+          <h3>Set Birth Year</h3>
+          <form
+            onSubmit={handleAddAuthor}
+            style={{ display: 'flex', flexDirection: 'column' }}
+          >
+            <label>
+              Name:
+              <select
+                value={selectedAuthor}
+                onChange={(event) => setSelectedAuthor(event.target.value)}
+              >
+                <option default value="">
+                  Select Author...
                 </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Birth Year
-            <input
-              type="number"
-              value={birthYear}
-              onChange={(event) => setBirthYear(event.target.value)}
-            />
-          </label>
-          <button style={{ alignSelf: 'flex-start' }} type="submit">
-            Submit
-          </button>
-        </form>
-      </div>
+                {authors.map((a) => (
+                  <option key={a.id} value={a.name}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Birth Year
+              <input
+                type="number"
+                value={birthYear}
+                onChange={(event) => setBirthYear(event.target.value)}
+              />
+            </label>
+            <button style={{ alignSelf: 'flex-start' }} type="submit">
+              Submit
+            </button>
+          </form>
+        </div>
+      )}
     </>
   )
 }

@@ -29,12 +29,28 @@ const setAuthors = async () => {
   }
 }
 
+const setUser = async () => {
+  const user = new User({
+    username: 'root',
+    favoriteGenre: 'patterns',
+    password: 'secret',
+  })
+  await user.save()
+}
+
 const initializeDB = async () => {
   await Author.deleteMany({})
+  console.log('Deleted authors')
   await Book.deleteMany({})
+  console.log('Deleted books')
   await User.deleteMany({})
+  console.log('Deleted users')
   await setAuthors()
+  console.log('Added dummy authors')
   await setBooks()
+  console.log('Added dummy books')
+  await setUser()
+  console.log('Added dummy user')
 }
 
 mongoose
@@ -103,7 +119,7 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     bookCount: async () => {
-      const bookCount = await Book.count({})
+      const bookCount = await Book.countDocuments({})
       return bookCount
     },
     allBooks: async (root, args) => {
@@ -115,7 +131,9 @@ const resolvers = {
       }
 
       if (args.genre) {
-        const books = await Book.find({ genres: { $in: args.genre } })
+        const books = await Book.find({ genres: { $in: args.genre } }).populate(
+          'author'
+        )
         return books
       }
 
@@ -123,7 +141,7 @@ const resolvers = {
       return books
     },
     authorCount: async () => {
-      const authorCount = await Author.count({})
+      const authorCount = await Author.countDocuments({})
       return authorCount
     },
     allAuthors: async () => {
@@ -134,7 +152,7 @@ const resolvers = {
   },
   Author: {
     bookCount: async (root) => {
-      const bookCount = await Book.count({
+      const bookCount = await Book.countDocuments({
         author: root.id,
       })
       return bookCount
@@ -157,9 +175,10 @@ const resolvers = {
       }
 
       const book = new Book({ ...args })
-      let author = await Author.find({ name: book.author })
+      let author = await Author.findOne({ name: args.author })
+
       try {
-        if (!author[0]) {
+        if (!author) {
           author = new Author({ name: args.author })
           const dbAuthor = await author.save()
           book.author = dbAuthor._id
@@ -238,7 +257,6 @@ const server = new ApolloServer({
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
       const currentUser = await User.findById(decodedToken.id)
-      console.log(currentUser)
       return { currentUser }
     }
   },
