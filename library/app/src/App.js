@@ -3,7 +3,8 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import Login from './components/Login'
 import Recommended from './components/Recommended'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { ALL_BOOKS, BOOK_ADDED } from './queries/books'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -24,8 +25,31 @@ const App = () => {
     }
   }, [])
 
+  const updateCacheWith = (addedBook) => {
+    // Fix this
+    const dataInStore = client.readQuery({ query: ALL_BOOKS })
+    const includedAlready = !!dataInStore.allBooks.find(
+      (b) => b.id === addedBook.id
+    )
+    if (!includedAlready) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks: dataInStore.allBooks.concat(addedBook) },
+      })
+    }
+  }
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedBook = subscriptionData.data.bookAdded
+      updateCacheWith(addedBook)
+      window.alert('New book added to the book list')
+    },
+  })
+
   return (
     <div>
+      {error && <p>{error}</p>}
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>

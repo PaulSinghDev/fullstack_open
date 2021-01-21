@@ -3,12 +3,14 @@ const {
   gql,
   UserInputError,
   AuthenticationError,
+  PubSub,
 } = require('apollo-server')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const config = require('./utils/config')
 const { Author, Book, User } = require('./models')
 const { authors, books } = require('./dummy/data')
+const pubsub = new PubSub()
 
 const JWT_SECRET = config.JWT_SECRET
 const MONGO_URI = config.MONGO_URI
@@ -18,6 +20,8 @@ const setBooks = async () => {
     const author = await Author.find({ name: b.author })
     b.author = author[0]._id
     const book = new Book(b)
+    author[0].books = author[0].books.concat(book._id)
+    await author[0].save()
     await book.save()
   }
 }
@@ -70,6 +74,10 @@ mongoose
   .catch((err) => console.log(`error connecting to mongo: ${err.message}`))
 
 const typeDefs = gql`
+  type Subscription {
+    bookAdded: Book!
+  }
+
   type User {
     username: String!
     favoriteGenre: String!
@@ -99,7 +107,8 @@ const typeDefs = gql`
   type Author {
     name: String!
     born: Int
-    bookCount: Int!
+    books: [Book!]
+    bookCount: Int
     id: ID!
   }
 
@@ -118,10 +127,6 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: async () => {
-      const bookCount = await Book.countDocuments({})
-      return bookCount
-    },
     allBooks: async (root, args) => {
       if (args.author) {
         const books = (await Book.find({}).populate('author')).filter(
@@ -145,18 +150,10 @@ const resolvers = {
       return authorCount
     },
     allAuthors: async () => {
-      const authors = await Author.find({})
+      const authors = await Author.find({}).populate('books')
       return authors
     },
     me: (root, args, context) => context.currentUser,
-  },
-  Author: {
-    bookCount: async (root) => {
-      const bookCount = await Book.countDocuments({
-        author: root.id,
-      })
-      return bookCount
-    },
   },
   Mutation: {
     addBook: async (root, args, context) => {
@@ -180,12 +177,14 @@ const resolvers = {
       try {
         if (!author) {
           author = new Author({ name: args.author })
+          author.books = [book._id]
           const dbAuthor = await author.save()
           book.author = dbAuthor._id
         } else {
           book.author = author._id
         }
         const dbBook = (await book.save()).populate('author').execPopulate()
+        pubsub.publish('BOOK_ADDED', { bookAdded: dbBook })
         return dbBook
       } catch (err) {
         throw new UserInputError(err.message, { invalidArgs: args })
@@ -247,6 +246,11 @@ const resolvers = {
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     },
   },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED']),
+    },
+  },
 }
 
 const server = new ApolloServer({
@@ -262,6 +266,7 @@ const server = new ApolloServer({
   },
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })

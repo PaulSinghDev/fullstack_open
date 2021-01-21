@@ -11,7 +11,7 @@ const Recommended = ({ show }) => {
 
   useEffect(() => {
     if (genreData) {
-      setGenre(genreData.me.favoriteGenre)
+      setGenre(genreData.me?.favoriteGenre)
       getBooksByGenre({ variables: { genre } })
     }
   }, [show, genreData]) //eslint-disable-line

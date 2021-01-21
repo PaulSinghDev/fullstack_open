@@ -10,18 +10,24 @@ const NewBook = ({ setError }) => {
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
   const [createBook] = useMutation(ADD_BOOK, {
-    onError: (err) => setError(err.message),
+    onError: (err) => {
+      setError(err.message)
+      setTimeout(() => {
+        setError('')
+      }, 5000)
+    },
     update: (store, response) => {
       const authorsInStore = store.readQuery({ query: ALL_AUTHORS })
       const booksInStore = store.readQuery({ query: ALL_BOOKS })
 
-      store.writeQuery({
-        query: ALL_BOOKS,
-        data: {
-          ...booksInStore,
-          allBooks: [...booksInStore.allBooks, response.data.addBook],
-        },
-      })
+      if (!booksInStore.allBooks.find((b) => b.id === response.data.addBook.id))
+        store.writeQuery({
+          query: ALL_BOOKS,
+          data: {
+            ...booksInStore,
+            allBooks: [...booksInStore.allBooks, response.data.addBook],
+          },
+        })
 
       const authorObject = authorsInStore.allAuthors.find(
         (a) => a.name === response.data.addBook.author.name
@@ -43,8 +49,6 @@ const NewBook = ({ setError }) => {
 
   const submit = (event) => {
     event.preventDefault()
-
-    console.log('add book...')
     createBook({
       variables: {
         title,
